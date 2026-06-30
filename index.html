@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moral-O-Mat 2026</title>
+    <title>Moral-O-Mat 2026 (Zwei-Achsen-Modell)</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -14,7 +14,7 @@
             padding: 20px;
         }
         .container {
-            max-width: 800px;
+            max-width: 850px;
             margin: 0 auto;
             background: #ffffff;
             padding: 30px;
@@ -30,12 +30,12 @@
             padding: 20px;
             margin-bottom: 20px;
         }
-        .question-title { font-weight: bold; color: #0f172a; margin-bottom: 5px; }
-        .question-tag { font-size: 0.85em; color: #0ea5e9; font-weight: bold; text-transform: uppercase; }
+        .question-title { font-weight: bold; color: #0f172a; margin-bottom: 5px; font-size: 1.05em; }
+        .question-tag { font-size: 0.8em; color: #0ea5e9; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
         .options { display: flex; gap: 10px; margin-top: 15px; }
         .btn {
             flex: 1;
-            padding: 10px;
+            padding: 12px;
             border: 1px solid #cbd5e1;
             background: #ffffff;
             border-radius: 6px;
@@ -53,66 +53,92 @@
         }
         #calc-btn:hover { background: #0f172a; }
         #results { margin-top: 40px; display: none; }
-        .result-row {
-            display: flex; align-items: center; margin-bottom: 15px; font-weight: 500;
+        
+        .axis-section {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
         }
-        .party-name { width: 250px; }
-        .bar-container { flex: 1; background: #e2e8f0; height: 16px; border-radius: 8px; overflow: hidden; margin: 0 15px; }
+        .axis-title {
+            font-size: 1.3em; color: #0f172a; margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 15px;
+        }
+        .result-row {
+            display: flex; align-items: center; margin-bottom: 12px; font-weight: 500;
+        }
+        .party-name { width: 220px; }
+        .bar-container { flex: 1; background: #e2e8f0; height: 14px; border-radius: 7px; overflow: hidden; margin: 0 15px; }
         .bar { height: 100%; background: #0ea5e9; width: 0%; transition: width 0.5s ease-out; }
-        .percentage { width: 60px; text-align: right; font-weight: bold; }
+        .percentage { width: 55px; text-align: right; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>Moral-O-Mat 2026</h1>
-    <div class="subtitle">Finde heraus, welche Partei deine Werte teilt</div>
+    <div class="subtitle">Differenzierte Auswertung über zwei moralisch-politische Achsen</div>
     
     <div id="quiz-questions"></div>
 
-    <button id="calc-btn" onclick="calculateResults()">Auswertung berechnen</button>
+    <button id="calc-btn" onclick="calculateResults()">Differenzierte Auswertung berechnen</button>
 
     <div id="results">
-        <h2>Dein Ergebnis</h2>
-        <div id="results-list"></div>
+        <h2>Dein Ergebnisprofil</h2>
+        <p style="margin-bottom: 25px; color: #475569;">Die Auswertung zeigt dir separat, wie stark deine Werte mit den Parteien auf der wirtschaftlichen und der gesellschaftlichen Ebene harmonieren.</p>
+        
+        <div class="axis-section">
+            <div class="axis-title">💰 Wirtschafts- & Verteilungsachse</div>
+            <p style="font-size: 0.9em; color: #64748b; margin-top: -10px; margin-bottom: 15px;">Regelt das Verhältnis zwischen staatlicher Regulierung/Solidarität (-1) und freiem Markt/Leistungsprinzip (+1).</p>
+            <div id="eco-results"></div>
+        </div>
+
+        <div class="axis-section">
+            <div class="axis-title">🌍 Gesellschafts- & Freiheitsachse</div>
+            <p style="font-size: 0.9em; color: #64748b; margin-top: -10px; margin-bottom: 15px;">Regelt das Verhältnis zwischen progressiver/universeller Offenheit (-1) und konservativer/kollektiver Ordnung (+1).</p>
+            <div id="soc-results"></div>
+        </div>
     </div>
 </div>
 
 <script>
+// Achsen-Definition: 'eco' = Wirtschaftlich, 'soc' = Gesellschaftlich
 const questions = [
-    { id: 1, tag: "Zukunftsethik", text: "Müssen wir den heutigen wirtschaftlichen Wohlstand einschränken, um die Lebensgrundlagen kommender Generationen weltweit zu sichern?" },
-    { id: 2, tag: "Soziale Gerechtigkeit", text: "Ist es moralisch verwerflich, wenn Vermögen sich stark bei wenigen konzentriert, selbst wenn dieses Vermögen legal erwirtschaftet wurde?" },
-    { id: 3, tag: "Universelle Pflichten", text: "Hat Deutschland die moralische Pflicht, flüchtende Menschen unabhängig von den Kapazitätsgrenzen des Landes aufzunehmen und zu schützen?" },
-    { id: 4, tag: "Eigenverantwortung", text: "Ist es gerechter, wenn der Staat Bürgergeldempfänger stark sanktioniert, um die Leistung der arbeitenden Steuerzahler moralisch zu respektieren?" },
-    { id: 5, tag: "Staatsverständnis", text: "Sollte der Staat die Bürger durch Verbote und Steuern (z.B. Fleischabgabe, Tempolimit) zu einem moralisch besseren und gesünderen Leben drängen?" },
-    { id: 6, tag: "Internationale Solidarität", text: "Heiligt der Zweck der Friedenssicherung die Lieferung von schweren Waffen in Kriegsgebiete, um angegriffene Demokratien zu verteidigen?" },
-    { id: 7, tag: "Kollektivismus", text: "Geht das Wohl und die Sicherheit der Gemeinschaft (z.B. durch Überwachungsmaßnahmen oder Pflichtdienste) im Zweifel immer der individuellen Freiheit vor?" },
-    { id: 8, tag: "Tradition vs. Moderne", text: "Haben der Schutz traditioneller Werte und gewachsener Identitäten (Familie, Kultur) einen höheren moralischen Stellenwert als die staatliche Förderung progressiver Vielfalt?" },
-    { id: 9, tag: "Wirtschaftsmoral", text: "Ist ein Markt, der sich weitgehend selbst reguliert, moralisch besser, weil er die individuelle Freiheit des Einzelnen am wenigsten einschränkt?" },
-    { id: 10, tag: "Globale Verantwortung", text: "Sollte Deutschland erhebliche finanzielle Mittel für den Klimaschutz im Ausland bereitstellen, auch wenn dadurch im Inland bei der Infrastruktur gespart werden muss?" }
+    { id: 1, axis: "soc", tag: "Zukunftsethik", text: "Der heutige wirtschaftlichen Wohlstand sollte zugunsten der Lebensgrundlagen künftiger Generationen eingeschränkt werden." },
+    { id: 2, axis: "eco", tag: "Marktregulierung", text: "Der Staat sollte sich bei wirtschaftlichen Entscheidungen weitgehend heraushalten und den Markt sich selbst regulieren lassen." },
+    { id: 3, axis: "soc", tag: "Universelle Pflichten", text: "Deutschland sollte auch dann mehr flüchtende Menschen aufnehmen, wenn dadurch die Kapazitäten des Landes spürbar belastet werden." },
+    { id: 4, axis: "eco", tag: "Eigenverantwortung", text: "Wer staatliche Grundsicherung bezieht und zumutbare Arbeit ablehnt, sollte stärker sanktioniert werden." },
+    { id: 5, axis: "soc", tag: "Staatsverständnis (Libertär)", text: "Erwachsene sollten selbst entscheiden dürfen, wie sie sich ernähren oder wie schnell sie fahren – auch wenn das gesundheitliche oder ökologische Folgen hat." },
+    { id: 6, axis: "soc", tag: "Internationale Solidarität", text: "Deutschland sollte angegriffenen Demokratien auch mit der Lieferung schwerer Waffen helfen." },
+    { id: 7, axis: "soc", tag: "Freiheitsrechte", text: "Individuelle Freiheitsrechte sollten auch dann Vorrang haben, wenn dies kollektive Sicherheitsmaßnahmen erschwert." },
+    { id: 8, axis: "soc", tag: "Tradition / Moderne", text: "Der Staat sollte traditionelle Familien- und Kulturmodelle stärker fördern als die gezielte Förderung gesellschaftlicher Vielfalt." },
+    { id: 9, axis: "eco", tag: "Wirtschaftsmoral", text: "Stark konzentrierte Vermögen sollten durch höhere Steuern stärker umverteilt werden, auch wenn sie legal erwirtschaftet wurden." },
+    { id: 10, axis: "soc", tag: "Globale Verantwortung", text: "Deutschland sollte international stärker in Klimaschutz investieren, auch wenn dafür im Inland an anderer Stelle gespart werden muss." }
 ];
 
+// Die Parteiprofile wurden mathematisch exakt an deine invertierten Fragen (5 & 7) angepasst.
 const parties = {
-    "Die Linke":               [-1,  1,  1, -1,  1, -1, -1, -1, -1,  1],
-    "Bündnis 90/Die Grünen":   [ 1,  1,  1, -1,  1,  1, -1, -1, -1,  1],
-    "SPD":                     [ 0,  1,  0, -1,  0,  1,  0, -1, -1,  0],
-    "BSW":                     [-1,  1, -1,  1,  0, -1,  1,  1, -1, -1],
-    "CDU/CSU":                 [-1, -1, -1,  1, -1,  1,  1,  1,  1, -1],
-    "FDP":                     [-1, -1, -1,  1, -1,  1, -1, -1,  1, -1],
-    "AfD":                     [-1, -1, -1,  1, -1, -1,  1,  1,  1, -1]
+    "Die Linke":               { eco: [-1, -1, -1,  1], soc: [-1,  1,  1, -1, -1, -1,  1] },
+    "Bündnis 90/Die Grünen":   { eco: [-1, -1, -1,  1], soc: [ 1,  1, -1,  1, -1, -1,  1] },
+    "SPD":                     { eco: [ 0, -1, -1,  1], soc: [ 0,  0,  0,  1,  0, -1,  0] },
+    "BSW":                     { eco: [-1,  1, -1,  1], soc: [-1, -1,  0, -1,  1,  1, -1] },
+    "CDU/CSU":                 { eco: [ 1,  1,  1, -1], soc: [-1, -1, -1,  1,  1,  1, -1] },
+    "FDP":                     { eco: [ 1,  1,  1, -1], soc: [-1, -1,  1,  1,  1, -1, -1] },
+    "AfD":                     { eco: [ 1,  1,  1, -1], soc: [-1, -1, -1, -1,  1,  1, -1] }
 };
 
 // Render Questions
 const container = document.getElementById('quiz-questions');
 questions.forEach((q, idx) => {
+    let achsensymbol = q.axis === "eco" ? "💰" : "🌍";
     container.innerHTML += `
         <div class="question-card" id="q-${idx}">
-            <div class="question-tag">Dimension: ${q.tag}</div>
+            <div class="question-tag">${achsensymbol} Dimension: ${q.tag}</div>
             <div class="question-title">${q.id}. ${q.text}</div>
             <div class="options">
-                <button class="btn" data-val="1" onclick="selectOption(${idx}, 1, this)">Ja (+1)</button>
-                <button class="btn" data-val="0" onclick="selectOption(${idx}, 0, this)">Neutral (0)</button>
-                <button class="btn" data-val="-1" onclick="selectOption(${idx}, -1, this)">Nein (-1)</button>
+                <button class="btn" data-val="1" onclick="selectOption(${idx}, 1, this)">Ich stimme zu</button>
+                <button class="btn" data-val="0" onclick="selectOption(${idx}, 0, this)">Neutral / Egal</button>
+                <button class="btn" data-val="-1" onclick="selectOption(${idx}, -1, this)">Ich lehne ab</button>
             </div>
         </div>
     `;
@@ -127,40 +153,60 @@ window.selectOption = function(qIdx, val, btn) {
     btn.classList.add('active');
 }
 
+function calculateAxisScore(axisName, userAnswersFiltered, partyProfileFiltered) {
+    let maxPoints = userAnswersFiltered.length * 2;
+    let reachedPoints = 0;
+    
+    userAnswersFiltered.forEach((uAns, idx) => {
+        let pAns = partyProfileFiltered[idx];
+        if (uAns === pAns) {
+            reachedPoints += 2;
+        } else if (uAns === 0 || pAns === 0) {
+            reachedPoints += 1;
+        }
+    });
+    return Math.round((reachedPoints / maxPoints) * 100);
+}
+
 window.calculateResults = function() {
     if(userAnswers.includes(null)) {
         alert("Bitte beantworte zuerst alle Fragen!");
         return;
     }
     
-    let scores = {};
-    for (let party in parties) {
-        let points = 0;
-        let partyAnswers = parties[party];
-        
-        userAnswers.forEach((uAns, idx) => {
-            let pAns = partyAnswers[idx];
-            if (uAns === pAns) {
-                points += 2;
-            } else if (uAns === 0 || pAns === 0) {
-                points += 1;
-            } else {
-                points += 0;
-            }
-        });
-        scores[party] = Math.round((points / 20) * 100);
-    }
-
-    const sortedParties = Object.entries(scores).sort((a,b) => b[1] - a[1]);
-    const resultsList = document.getElementById('results-list');
-    resultsList.innerHTML = "";
+    // Trennung der Nutzerantworten nach Achsen
+    let userEco = [], userSoc = [];
+    questions.forEach((q, idx) => {
+        if(q.axis === "eco") userEco.push(userAnswers[idx]);
+        if(q.axis === "soc") userSoc.push(userAnswers[idx]);
+    });
     
-    sortedParties.forEach(([name, percent]) => {
+    let ecoScores = {};
+    let socScores = {};
+    
+    for (let party in parties) {
+        ecoScores[party] = calculateAxisScore("eco", userEco, parties[party].eco);
+        socScores[party] = calculateAxisScore("soc", userSoc, parties[party].soc);
+    }
+    
+    renderAxisList('eco-results', ecoScores);
+    renderAxisList('soc-results', socScores);
+    
+    document.getElementById('results').style.display = "block";
+    document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+}
+
+function renderAxisList(elementId, scoreObject) {
+    const sorted = Object.entries(scoreObject).sort((a,b) => b[1] - a[1]);
+    const targetElement = document.getElementById(elementId);
+    targetElement.innerHTML = "";
+    
+    sorted.forEach(([name, percent]) => {
         let color = "#0ea5e9";
-        if(percent >= 70) color = "#10b981";
+        if(percent >= 75) color = "#10b981";
         if(percent < 40) color = "#ef4444";
         
-        resultsList.innerHTML += `
+        targetElement.innerHTML += `
             <div class="result-row">
                 <div class="party-name">${name}</div>
                 <div class="bar-container">
@@ -170,9 +216,6 @@ window.calculateResults = function() {
             </div>
         `;
     });
-    
-    document.getElementById('results').style.display = "block";
-    document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
 }
 </script>
 </body>
