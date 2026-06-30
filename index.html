@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moral-O-Mat 2026</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #334155;
+            background-color: #f1f5f9;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+        h1 { color: #1e293b; text-align: center; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: #64748b; margin-bottom: 30px; font-weight: bold; }
+        .question-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .question-title { font-weight: bold; color: #0f172a; margin-bottom: 5px; }
+        .question-tag { font-size: 0.85em; color: #0ea5e9; font-weight: bold; text-transform: uppercase; }
+        .options { display: flex; gap: 10px; margin-top: 15px; }
+        .btn {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn:hover { background: #f1f5f9; }
+        .btn.active[data-val="1"] { background: #dcfce7; border-color: #22c55e; color: #166534; }
+        .btn.active[data-val="0"] { background: #f1f5f9; border-color: #94a3b8; color: #334155; }
+        .btn.active[data-val="-1"] { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
+        #calc-btn {
+            display: block; width: 100%; padding: 15px; background: #1e293b; color: white;
+            border: none; border-radius: 8px; font-size: 1.1em; font-weight: bold; cursor: pointer; margin-top: 30px;
+        }
+        #calc-btn:hover { background: #0f172a; }
+        #results { margin-top: 40px; display: none; }
+        .result-row {
+            display: flex; align-items: center; margin-bottom: 15px; font-weight: 500;
+        }
+        .party-name { width: 250px; }
+        .bar-container { flex: 1; background: #e2e8f0; height: 16px; border-radius: 8px; overflow: hidden; margin: 0 15px; }
+        .bar { height: 100%; background: #0ea5e9; width: 0%; transition: width 0.5s ease-out; }
+        .percentage { width: 60px; text-align: right; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Moral-O-Mat 2026</h1>
+    <div class="subtitle">Finde heraus, welche Partei deine Werte teilt</div>
+    
+    <div id="quiz-questions"></div>
+
+    <button id="calc-btn" onclick="calculateResults()">Auswertung berechnen</button>
+
+    <div id="results">
+        <h2>Dein Ergebnis</h2>
+        <div id="results-list"></div>
+    </div>
+</div>
+
+<script>
+const questions = [
+    { id: 1, tag: "Zukunftsethik", text: "Müssen wir den heutigen wirtschaftlichen Wohlstand einschränken, um die Lebensgrundlagen kommender Generationen weltweit zu sichern?" },
+    { id: 2, tag: "Soziale Gerechtigkeit", text: "Ist es moralisch verwerflich, wenn Vermögen sich stark bei wenigen konzentriert, selbst wenn dieses Vermögen legal erwirtschaftet wurde?" },
+    { id: 3, tag: "Universelle Pflichten", text: "Hat Deutschland die moralische Pflicht, flüchtende Menschen unabhängig von den Kapazitätsgrenzen des Landes aufzunehmen und zu schützen?" },
+    { id: 4, tag: "Eigenverantwortung", text: "Ist es gerechter, wenn der Staat Bürgergeldempfänger stark sanktioniert, um die Leistung der arbeitenden Steuerzahler moralisch zu respektieren?" },
+    { id: 5, tag: "Staatsverständnis", text: "Sollte der Staat die Bürger durch Verbote und Steuern (z.B. Fleischabgabe, Tempolimit) zu einem moralisch besseren und gesünderen Leben drängen?" },
+    { id: 6, tag: "Internationale Solidarität", text: "Heiligt der Zweck der Friedenssicherung die Lieferung von schweren Waffen in Kriegsgebiete, um angegriffene Demokratien zu verteidigen?" },
+    { id: 7, tag: "Kollektivismus", text: "Geht das Wohl und die Sicherheit der Gemeinschaft (z.B. durch Überwachungsmaßnahmen oder Pflichtdienste) im Zweifel immer der individuellen Freiheit vor?" },
+    { id: 8, tag: "Tradition vs. Moderne", text: "Haben der Schutz traditioneller Werte und gewachsener Identitäten (Familie, Kultur) einen höheren moralischen Stellenwert als die staatliche Förderung progressiver Vielfalt?" },
+    { id: 9, tag: "Wirtschaftsmoral", text: "Ist ein Markt, der sich weitgehend selbst reguliert, moralisch besser, weil er die individuelle Freiheit des Einzelnen am wenigsten einschränkt?" },
+    { id: 10, tag: "Globale Verantwortung", text: "Sollte Deutschland erhebliche finanzielle Mittel für den Klimaschutz im Ausland bereitstellen, auch wenn dadurch im Inland bei der Infrastruktur gespart werden muss?" }
+];
+
+const parties = {
+    "Die Linke":               [-1,  1,  1, -1,  1, -1, -1, -1, -1,  1],
+    "Bündnis 90/Die Grünen":   [ 1,  1,  1, -1,  1,  1, -1, -1, -1,  1],
+    "SPD":                     [ 0,  1,  0, -1,  0,  1,  0, -1, -1,  0],
+    "BSW":                     [-1,  1, -1,  1,  0, -1,  1,  1, -1, -1],
+    "CDU/CSU":                 [-1, -1, -1,  1, -1,  1,  1,  1,  1, -1],
+    "FDP":                     [-1, -1, -1,  1, -1,  1, -1, -1,  1, -1],
+    "AfD":                     [-1, -1, -1,  1, -1, -1,  1,  1,  1, -1]
+};
+
+// Render Questions
+const container = document.getElementById('quiz-questions');
+questions.forEach((q, idx) => {
+    container.innerHTML += `
+        <div class="question-card" id="q-${idx}">
+            <div class="question-tag">Dimension: ${q.tag}</div>
+            <div class="question-title">${q.id}. ${q.text}</div>
+            <div class="options">
+                <button class="btn" data-val="1" onclick="selectOption(${idx}, 1, this)">Ja (+1)</button>
+                <button class="btn" data-val="0" onclick="selectOption(${idx}, 0, this)">Neutral (0)</button>
+                <button class="btn" data-val="-1" onclick="selectOption(${idx}, -1, this)">Nein (-1)</button>
+            </div>
+        </div>
+    `;
+});
+
+let userAnswers = new Array(questions.length).fill(null);
+
+window.selectOption = function(qIdx, val, btn) {
+    userAnswers[qIdx] = val;
+    const buttons = btn.parentElement.querySelectorAll('.btn');
+    buttons.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+}
+
+window.calculateResults = function() {
+    if(userAnswers.includes(null)) {
+        alert("Bitte beantworte zuerst alle Fragen!");
+        return;
+    }
+    
+    let scores = {};
+    for (let party in parties) {
+        let points = 0;
+        let partyAnswers = parties[party];
+        
+        userAnswers.forEach((uAns, idx) => {
+            let pAns = partyAnswers[idx];
+            if (uAns === pAns) {
+                points += 2;
+            } else if (uAns === 0 || pAns === 0) {
+                points += 1;
+            } else {
+                points += 0;
+            }
+        });
+        scores[party] = Math.round((points / 20) * 100);
+    }
+
+    const sortedParties = Object.entries(scores).sort((a,b) => b[1] - a[1]);
+    const resultsList = document.getElementById('results-list');
+    resultsList.innerHTML = "";
+    
+    sortedParties.forEach(([name, percent]) => {
+        let color = "#0ea5e9";
+        if(percent >= 70) color = "#10b981";
+        if(percent < 40) color = "#ef4444";
+        
+        resultsList.innerHTML += `
+            <div class="result-row">
+                <div class="party-name">${name}</div>
+                <div class="bar-container">
+                    <div class="bar" style="width: ${percent}%; background-color: ${color}"></div>
+                </div>
+                <div class="percentage">${percent}%</div>
+            </div>
+        `;
+    });
+    
+    document.getElementById('results').style.display = "block";
+    document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
