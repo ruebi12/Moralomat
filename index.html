@@ -97,6 +97,11 @@
             <p style="font-size: 0.9em; color: #64748b; margin-top: -10px; margin-bottom: 15px;">Regelt das Verhältnis zwischen progressiver/universeller Offenheit und konservativer/kollektiver Ordnung.</p>
             <div id="soc-results"></div>
         </div>
+
+        <div class="axis-section" style="background: #f0fdf4; border: 1px solid #bbf7d0;">
+            <div class="axis-title" style="color: #166534;">📜 Dein Werte-Fundament (Philosophischer Blick)</div>
+            <div id="philosophical-analysis" style="font-size: 0.95em; color: #1e293b; line-height: 1.6;"></div>
+        </div>
     </div>
 </div>
 
@@ -117,7 +122,7 @@ const questions = [
     // --- BEREICH WIRTSCHAFT & VERTEILUNG (10 Thesen) ---
     { id: 11, axis: "eco", tag: "Marktregulierung", text: "Der Staat sollte sich bei wirtschaftlichen Entscheidungen weitgehend heraushalten und den Markt sich selbst regulieren lassen." },
     { id: 12, axis: "eco", tag: "Eigenverantwortung", text: "Wer staatliche Grundsicherung bezieht und zumutbare Arbeit ablehnt, sollte stärker sanktioniert werden." },
-    { id: 13, axis: "eco", tag: "Wirtschaftsmoral", text: "Stark konzentrierte Vermögen sollten durch höhere Steuern stärker umverteilt werden, auch wenn sie legal erwirtschaftet wurden." },
+    { id: 13, axis: "eco", tag: "Wirtschaftsmoral", text: "Stark konzentrierte Vermögen sollten durch highere Steuern stärker umverteilt werden, auch wenn sie legal erwirtschaftet wurden." },
     { id: 14, axis: "eco", tag: "Globale Investitionen", text: "Deutschland sollte international stärker in Klimaschutz investieren, auch wenn dafür im Inland an anderer Stelle gespart werden muss." },
     { id: 15, axis: "eco", tag: "Soziale Solidarität", text: "Sozialleistungen für die ärmsten Menschen im Land sollten deutlich erhöht werden, auch wenn das Steuern oder Abgaben für die Mittelschicht steigen lässt." },
     { id: 16, axis: "eco", tag: "Zukunftsinvestitionen", text: "In bessere Bildung sollte deutlich mehr investiert werden, auch wenn dafür andere Bereiche wie Verteidigung oder Infrastruktur weniger Geld bekommen." },
@@ -127,7 +132,6 @@ const questions = [
     { id: 20, axis: "eco", tag: "Finanzpolitik", text: "Schulden für heutige Investitionen sollten verstärkt aufgenommen werden, auch wenn künftige Generationen sie zurückzahlen müssen." }
 ];
 
-// Die Profile spiegeln die Grundsatzprogramme sowie das reale Abstimmungsverhalten im Jahr 2026 wider.
 const parties = {
     "Die Linke": {
         soc: [ 1,  1, -1, -1,  1, -1,  1, -1,  1,  1],
@@ -202,7 +206,7 @@ function calculateAxisScore(userAnswersFiltered, partyProfileFiltered) {
 
 window.calculateResults = function() {
     if(userAnswers.includes(null)) {
-        alert("Bitte beantworte zuerst alle Fragen!");
+        alert("Bitte beantwortte zuerst alle Fragen!");
         return;
     }
     
@@ -222,6 +226,46 @@ window.calculateResults = function() {
     
     renderAxisList('eco-results', ecoScores);
     renderAxisList('soc-results', socScores);
+    
+    // --- NEU: ZUGÄNGLICHE PHILOSOPHISCHE AUSWERTUNG ---
+    // Wir prüfen die Fragen zur weltweiten Verantwortung und Nächstenliebe: Q2 (Flüchtlinge), Q7 (Internationale Moral), Q14 (Klimaschutz international)
+    let universalistScore = 0;
+    if (userAnswers[1] === 1) universalistScore++;   // Zustimmung zu These 2
+    if (userAnswers[6] === 1) universalistScore++;   // Zustimmung zu These 7
+    if (userAnswers[13] === 1) universalistScore++;  // Zustimmung zu These 14
+    if (userAnswers[1] === -1) universalistScore--;  // Ablehnung zu These 2
+    if (userAnswers[6] === -1) universalistScore--;  // Ablehnung zu These 7
+
+    const philElement = document.getElementById('philosophical-analysis');
+    let textAnalyse = "";
+
+    if (universalistScore >= 2) {
+        textAnalyse = `
+            <p><strong>Dein Ergebnis zeigt: Dir sind universelle Werte wichtig.</strong></p>
+            <p>Deine Antworten bedeuten, dass für dich Mitgefühl, Menschenrechte und der Schutz der Zukunft nicht an Grenzen aufhören. Das passt gut zum christlichen Gebot der <em>Nächstenliebe</em> und der antiken Philosophie (wie der Stoa), die besagen: Jeder Mensch hat die gleiche Würde, und wir tragen Verantwortung füreinander und für die Umwelt.</p>
+            <p style="font-style: italic; color: #475569; font-size: 0.9em; border-left: 3px solid #10b981; padding-left: 10px; margin-top: 15px;">
+                <strong>Hinweis zu den Parteien:</strong> Die großen demokratischen Kräfte (von der CDU/CSU über FDP, SPD, Grüne bis zu den Linken) teilen dieses gemeinsame Werte-Spielfeld. Sie streiten heftig über Geld und Wirtschaft, aber sie achten alle die universellen Menschenrechte des Grundgesetzes. Die Programmatik der AfD hingegen steht in einem klaren Widerspruch zu diesem Fundament, da sie Solidarität und Rechte streng von der Herkunft abhängig machen will.
+            </p>
+        `;
+    } else if (universalistScore <= -1) {
+        textAnalyse = `
+            <p><strong>Dein Ergebnis zeigt: Dir sind der Schutz der eigenen Gemeinschaft und feste Regeln wichtig.</strong></p>
+            <p>Deine Antworten bedeuten, dass du den Erhalt des eigenen Wohlstands, nationale Eigenständigkeit und das Vertraute im Vordergrund siehst. In der Geschichte entspricht das dem Denken, bei dem der Schutz der eigenen Stadt und der eigenen Landsleute Vorrang vor weltweiten Verpflichtungen hat.</p>
+            <p style="font-style: italic; color: #475569; font-size: 0.9em; border-left: 3px solid #ef4444; padding-left: 10px; margin-top: 15px;">
+                <strong>Hinweis zur Werte-Einordnung:</strong> Diese Position deckt sich stark mit den Kernforderungen der AfD. Du solltest dir jedoch bewusst sein, dass dieser Kurs das klassische christlich-humanitäre Werte-Spielfeld verlässt, das eine Gleichbehandlung aller Menschen fordert. Aus diesem Grund unterscheidet sich dieser Ansatz auch grundlegend vom gemeinsamen Verfassungskonsens aller anderen Parteien (von links bis konservativ), für die die universellen Menschenrechte unverhandelbar sind.
+            </p>
+        `;
+    } else {
+        textAnalyse = `
+            <p><strong>Dein Ergebnis zeigt: Du suchst nach einem praktischen Mittelweg.</strong></p>
+            <p>Du wägst von Fall zu Fall ab: Du möchtest zwar helfen und die Zukunft schützen (z. B. beim Klima), willst aber gleichzeitig, dass das Land wirtschaftlich stabil bleibt und die Bürger nicht überfordert werden. Der Philosoph Aristoteles nannte das die <em>"Goldene Mitte"</em> – ein vernünftiges Maßhalten ohne Extreme.</p>
+            <p style="font-size: 0.9em; color: #475569; margin-top: 15px;">
+                Dieser Sinn für den Kompromiss ist der Kern unseres demokratischen Systems. Er funktioniert, weil sich die Parteien von der CDU bis zur Linken im Bundestag gegenseitig kontrollieren und korrigieren, während sie den politischen Gegner als legitimen Partner akzeptieren. Dies unterscheidet sich deutlich von Gruppierungen, die das gesamte politische System pauschal ablehnen.
+            </p>
+        `;
+    }
+    
+    philElement.innerHTML = textAnalyse;
     
     document.getElementById('results').style.display = "block";
     document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
