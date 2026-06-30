@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moral-O-Mat 2026 (Zwei-Achsen-Modell)</title>
+    <title>Moral-O-Mat 2026 (Extended 20-Thesen-Modell)</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -87,13 +87,13 @@
         <h2>Dein Ergebnisprofil</h2>
         
         <div class="axis-section">
-            <div class="axis-title">💰 Wirtschafts- & Verteilungsachse</div>
+            <div class="axis-title">💰 Wirtschafts- & Verteilungsachse (10 Thesen)</div>
             <p style="font-size: 0.9em; color: #64748b; margin-top: -10px; margin-bottom: 15px;">Regelt das Verhältnis zwischen staatlicher Regulierung/Solidarität und freiem Markt/Leistungsprinzip.</p>
             <div id="eco-results"></div>
         </div>
 
         <div class="axis-section">
-            <div class="axis-title">🌍 Gesellschafts- & Freiheitsachse</div>
+            <div class="axis-title">🌍 Gesellschafts- & Freiheitsachse (10 Thesen)</div>
             <p style="font-size: 0.9em; color: #64748b; margin-top: -10px; margin-bottom: 15px;">Regelt das Verhältnis zwischen progressiver/universeller Offenheit und konservativer/kollektiver Ordnung.</p>
             <div id="soc-results"></div>
         </div>
@@ -102,26 +102,61 @@
 
 <script>
 const questions = [
+    // --- BEREICH GESELLSCHAFT & WERTE (10 Thesen) ---
     { id: 1, axis: "soc", tag: "Zukunftsethik", text: "Der heutige wirtschaftliche Wohlstand sollte zugunsten der Lebensgrundlagen künftiger Generationen eingeschränkt werden." },
-    { id: 2, axis: "eco", tag: "Marktregulierung", text: "Der Staat sollte sich bei wirtschaftlichen Entscheidungen weitgehend heraushalten und den Markt sich selbst regulieren lassen." },
-    { id: 3, axis: "soc", tag: "Universelle Pflichten", text: "Deutschland sollte auch dann mehr flüchtende Menschen aufnehmen, wenn dadurch die Kapazitäten des Landes spürbar belastet werden." },
-    { id: 4, axis: "eco", tag: "Eigenverantwortung", text: "Wer staatliche Grundsicherung bezieht und zumutbare Arbeit ablehnt, sollte stärker sanktioniert werden." },
-    { id: 5, axis: "soc", tag: "Staatsverständnis (Libertär)", text: "Erwachsene sollten selbst entscheiden dürfen, wie sie sich ernähren oder wie schnell sie fahren – auch wenn das gesundheitliche oder ökologische Folgen hat." },
-    { id: 6, axis: "soc", tag: "Internationale Solidarität", text: "Deutschland sollte angegriffenen Demokratien auch mit der Lieferung schwerer Waffen helfen." },
-    { id: 7, axis: "soc", tag: "Freiheitsrechte", text: "Der Schutz der persönlichen Freiheit des Einzelnen ist wichtiger als staatliche Überwachung oder Kontrollen zur Sicherheit aller." },
-    { id: 8, axis: "soc", tag: "Tradition / Moderne", text: "Der Staat sollte traditionelle Familien- und Kulturmodelle stärker fördern als die gezielte Förderung gesellschaftlicher Vielfalt." },
-    { id: 9, axis: "eco", tag: "Wirtschaftsmoral", text: "Stark konzentrierte Vermögen sollten durch höhere Steuern stärker umverteilt werden, auch wenn sie legal erwirtschaftet wurden." },
-    { id: 10, axis: "soc", tag: "Globale Verantwortung", text: "Deutschland sollte international stärker in Klimaschutz investieren, auch wenn dafür im Inland an anderer Stelle gespart werden muss." }
+    { id: 2, axis: "soc", tag: "Universelle Pflichten", text: "Deutschland sollte auch dann mehr flüchtende Menschen aufnehmen, wenn dadurch die Kapazitäten des Landes spürbar belastet werden." },
+    { id: 3, axis: "soc", tag: "Staatsverständnis", text: "Erwachsene sollten selbst entscheiden dürfen, wie sie sich ernähren oder wie schnell sie fahren – auch wenn das gesundheitliche oder ökologische Folgen hat." },
+    { id: 4, axis: "soc", tag: "Außenpolitik", text: "Deutschland sollte angegriffenen Demokratien auch mit der Lieferung schwerer Waffen helfen." },
+    { id: 5, axis: "soc", tag: "Freiheitsrechte", text: "Der Schutz der persönlichen Freiheit des Einzelnen ist wichtiger als staatliche Überwachung oder Kontrollen zur Sicherheit aller." },
+    { id: 6, axis: "soc", tag: "Tradition / Moderne", text: "Der Staat sollte traditionelle Familien- und Kulturmodelle stärker fördern als die gezielte Förderung gesellschaftlicher Vielfalt." },
+    { id: 7, axis: "soc", tag: "Internationale Moral", text: "Deutschland sollte international unterdrückte Gruppen unterstützen, auch wenn das wichtige diplomatische oder wirtschaftliche Partnerschaften belastet." },
+    { id: 8, axis: "soc", tag: "Strafjustiz", text: "Strafen für Straftäter sollten primär der Vergeltung dienen, nicht der Resozialisierung." },
+    { id: 9, axis: "soc", tag: "EU-Integration", text: "Deutschland sollte mehr nationale Souveränität an die EU abgeben, um gemeinsame europäische Politik zu stärken." },
+    { id: 10, axis: "soc", tag: "Demokratieverständnis", text: "Wichtige politische Entscheidungen sollten häufiger per Volksabstimmung statt durch das Parlament getroffen werden." },
+
+    // --- BEREICH WIRTSCHAFT & VERTEILUNG (10 Thesen) ---
+    { id: 11, axis: "eco", tag: "Marktregulierung", text: "Der Staat sollte sich bei wirtschaftlichen Entscheidungen weitgehend heraushalten und den Markt sich selbst regulieren lassen." },
+    { id: 12, axis: "eco", tag: "Eigenverantwortung", text: "Wer staatliche Grundsicherung bezieht und zumutbare Arbeit ablehnt, sollte stärker sanktioniert werden." },
+    { id: 13, axis: "eco", tag: "Wirtschaftsmoral", text: "Stark konzentrierte Vermögen sollten durch höhere Steuern stärker umverteilt werden, auch wenn sie legal erwirtschaftet wurden." },
+    { id: 14, axis: "eco", tag: "Globale Investitionen", text: "Deutschland sollte international stärker in Klimaschutz investieren, auch wenn dafür im Inland an anderer Stelle gespart werden muss." },
+    { id: 15, axis: "eco", tag: "Soziale Solidarität", text: "Sozialleistungen für die ärmsten Menschen im Land sollten deutlich erhöht werden, auch wenn das Steuern oder Abgaben für die Mittelschicht steigen lässt." },
+    { id: 16, axis: "eco", tag: "Zukunftsinvestitionen", text: "In bessere Bildung sollte deutlich mehr investiert werden, auch wenn dafür andere Bereiche wie Verteidigung oder Infrastruktur weniger Geld bekommen." },
+    { id: 17, axis: "eco", tag: "Generationengerechtigkeit", text: "Die Rente der heutigen Generation sollte garantiert bleiben, auch wenn jüngere Generationen dafür höhere Beiträge zahlen müssen." },
+    { id: 18, axis: "eco", tag: "Arbeitswelt", text: "Der gesetzliche Mindestlohn sollte deutlich erhöht werden, auch wenn das laut Kritikern Arbeitsplätze kosten könnte." },
+    { id: 19, axis: "eco", tag: "Wohnungsmarkt", text: "Mieten sollten stärker staatlich reguliert werden (Mietpreisbremse), auch wenn das laut Kritikern den Wohnungsbau bremst." },
+    { id: 20, axis: "eco", tag: "Finanzpolitik", text: "Schulden für heutige Investitionen sollten verstärkt aufgenommen werden, auch wenn künftige Generationen sie zurückzahlen müssen." }
 ];
 
+// Die Profile spiegeln die Grundsatzprogramme sowie das reale Abstimmungsverhalten im Jahr 2026 wider.
 const parties = {
-    "Die Linke":               { eco: [-1, -1, -1,  1], soc: [-1,  1,  1, -1, -1, -1,  1] },
-    "Bündnis 90/Die Grünen":   { eco: [-1, -1, -1,  1], soc: [ 1,  1, -1,  1, -1, -1,  1] },
-    "SPD":                     { eco: [ 0, -1, -1,  1], soc: [ 0,  0,  0,  1,  0, -1,  0] },
-    "BSW":                     { eco: [-1,  1, -1,  1], soc: [-1, -1,  0, -1,  1,  1, -1] },
-    "CDU/CSU":                 { eco: [ 1,  1,  1, -1], soc: [-1, -1, -1,  1,  1,  1, -1] },
-    "FDP":                     { eco: [ 1,  1,  1, -1], soc: [-1, -1,  1,  1,  1, -1, -1] },
-    "AfD":                     { eco: [ 1,  1,  1, -1], soc: [-1, -1, -1, -1,  1,  1, -1] }
+    "Die Linke": {
+        soc: [ 1,  1, -1, -1,  1, -1,  1, -1,  1,  1],
+        eco: [-1, -1,  1,  1,  1,  1,  0,  1,  1,  1]
+    },
+    "Bündnis 90/Die Grünen": {
+        soc: [ 1,  1, -1,  1, -1, -1,  1, -1,  1,  0],
+        eco: [-1, -1,  1,  1,  1,  1, -1,  1,  1,  1]
+    },
+    "SPD": {
+        soc: [ 0,  0,  0,  1,  0, -1,  1, -1,  1, -1],
+        eco: [-1, -1,  1,  0,  1,  1,  1,  1,  1,  1]
+    },
+    "BSW": {
+        soc: [-1, -1,  0, -1,  1,  1, -1,  1, -1,  1],
+        eco: [-1,  1,  1, -1,  1,  1,  1,  1,  1, -1]
+    },
+    "CDU/CSU": {
+        soc: [-1, -1,  1,  1, -1,  1,  0,  1, -1, -1],
+        eco: [ 1,  1, -1, -1, -1,  0,  1, -1, -1, -1]
+    },
+    "FDP": {
+        soc: [-1, -1,  1,  1,  1, -1,  0, -1,  0, -1],
+        eco: [ 1,  1, -1, -1, -1,  1, -1, -1, -1, -1]
+    },
+    "AfD": {
+        soc: [-1, -1,  1, -1,  0,  1, -1,  1, -1,  1],
+        eco: [ 1,  1, -1, -1, -1, -1,  1, -1, -1, -1]
+    }
 };
 
 // Render Questions
@@ -150,7 +185,7 @@ window.selectOption = function(qIdx, val, btn) {
     btn.classList.add('active');
 }
 
-function calculateAxisScore(axisName, userAnswersFiltered, partyProfileFiltered) {
+function calculateAxisScore(userAnswersFiltered, partyProfileFiltered) {
     let maxPoints = userAnswersFiltered.length * 2;
     let reachedPoints = 0;
     
@@ -181,8 +216,8 @@ window.calculateResults = function() {
     let socScores = {};
     
     for (let party in parties) {
-        ecoScores[party] = calculateAxisScore("eco", userEco, parties[party].eco);
-        socScores[party] = calculateAxisScore("soc", userSoc, parties[party].soc);
+        ecoScores[party] = calculateAxisScore(userEco, parties[party].eco);
+        socScores[party] = calculateAxisScore(userSoc, parties[party].soc);
     }
     
     renderAxisList('eco-results', ecoScores);
