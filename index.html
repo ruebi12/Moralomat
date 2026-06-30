@@ -77,46 +77,43 @@
 
 <div class="container">
     <h1>Moral-O-Mat 2026</h1>
-    <div class="subtitle">Differenzierte Auswertung über zwei moralisch-politische Achsen</div>
+    <div class="subtitle">Finde heraus, welche Partei deine Werte teilt</div>
     
     <div id="quiz-questions"></div>
 
-    <button id="calc-btn" onclick="calculateResults()">Differenzierte Auswertung berechnen</button>
+    <button id="calc-btn" onclick="calculateResults()">Auswertung berechnen</button>
 
     <div id="results">
         <h2>Dein Ergebnisprofil</h2>
-        <p style="margin-bottom: 25px; color: #475569;">Die Auswertung zeigt dir separat, wie stark deine Werte mit den Parteien auf der wirtschaftlichen und der gesellschaftlichen Ebene harmonieren.</p>
         
         <div class="axis-section">
             <div class="axis-title">💰 Wirtschafts- & Verteilungsachse</div>
-            <p style="font-size: 0.9em; color: #64748b; margin-top: -10px; margin-bottom: 15px;">Regelt das Verhältnis zwischen staatlicher Regulierung/Solidarität (-1) und freiem Markt/Leistungsprinzip (+1).</p>
+            <p style="font-size: 0.9em; color: #64748b; margin-top: -10px; margin-bottom: 15px;">Regelt das Verhältnis zwischen staatlicher Regulierung/Solidarität und freiem Markt/Leistungsprinzip.</p>
             <div id="eco-results"></div>
         </div>
 
         <div class="axis-section">
             <div class="axis-title">🌍 Gesellschafts- & Freiheitsachse</div>
-            <p style="font-size: 0.9em; color: #64748b; margin-top: -10px; margin-bottom: 15px;">Regelt das Verhältnis zwischen progressiver/universeller Offenheit (-1) und konservativer/kollektiver Ordnung (+1).</p>
+            <p style="font-size: 0.9em; color: #64748b; margin-top: -10px; margin-bottom: 15px;">Regelt das Verhältnis zwischen progressiver/universeller Offenheit und konservativer/kollektiver Ordnung.</p>
             <div id="soc-results"></div>
         </div>
     </div>
 </div>
 
 <script>
-// Achsen-Definition: 'eco' = Wirtschaftlich, 'soc' = Gesellschaftlich
 const questions = [
-    { id: 1, axis: "soc", tag: "Zukunftsethik", text: "Der heutige wirtschaftlichen Wohlstand sollte zugunsten der Lebensgrundlagen künftiger Generationen eingeschränkt werden." },
+    { id: 1, axis: "soc", tag: "Zukunftsethik", text: "Der heutige wirtschaftliche Wohlstand sollte zugunsten der Lebensgrundlagen künftiger Generationen eingeschränkt werden." },
     { id: 2, axis: "eco", tag: "Marktregulierung", text: "Der Staat sollte sich bei wirtschaftlichen Entscheidungen weitgehend heraushalten und den Markt sich selbst regulieren lassen." },
     { id: 3, axis: "soc", tag: "Universelle Pflichten", text: "Deutschland sollte auch dann mehr flüchtende Menschen aufnehmen, wenn dadurch die Kapazitäten des Landes spürbar belastet werden." },
     { id: 4, axis: "eco", tag: "Eigenverantwortung", text: "Wer staatliche Grundsicherung bezieht und zumutbare Arbeit ablehnt, sollte stärker sanktioniert werden." },
     { id: 5, axis: "soc", tag: "Staatsverständnis (Libertär)", text: "Erwachsene sollten selbst entscheiden dürfen, wie sie sich ernähren oder wie schnell sie fahren – auch wenn das gesundheitliche oder ökologische Folgen hat." },
     { id: 6, axis: "soc", tag: "Internationale Solidarität", text: "Deutschland sollte angegriffenen Demokratien auch mit der Lieferung schwerer Waffen helfen." },
-    { id: 7, axis: "soc", tag: "Freiheitsrechte", text: "Individuelle Freiheitsrechte sollten auch dann Vorrang haben, wenn dies kollektive Sicherheitsmaßnahmen erschwert." },
+    { id: 7, axis: "soc", tag: "Freiheitsrechte", text: "Der Schutz der persönlichen Freiheit des Einzelnen ist wichtiger als staatliche Überwachung oder Kontrollen zur Sicherheit aller." },
     { id: 8, axis: "soc", tag: "Tradition / Moderne", text: "Der Staat sollte traditionelle Familien- und Kulturmodelle stärker fördern als die gezielte Förderung gesellschaftlicher Vielfalt." },
     { id: 9, axis: "eco", tag: "Wirtschaftsmoral", text: "Stark konzentrierte Vermögen sollten durch höhere Steuern stärker umverteilt werden, auch wenn sie legal erwirtschaftet wurden." },
     { id: 10, axis: "soc", tag: "Globale Verantwortung", text: "Deutschland sollte international stärker in Klimaschutz investieren, auch wenn dafür im Inland an anderer Stelle gespart werden muss." }
 ];
 
-// Die Parteiprofile wurden mathematisch exakt an deine invertierten Fragen (5 & 7) angepasst.
 const parties = {
     "Die Linke":               { eco: [-1, -1, -1,  1], soc: [-1,  1,  1, -1, -1, -1,  1] },
     "Bündnis 90/Die Grünen":   { eco: [-1, -1, -1,  1], soc: [ 1,  1, -1,  1, -1, -1,  1] },
@@ -174,7 +171,6 @@ window.calculateResults = function() {
         return;
     }
     
-    // Trennung der Nutzerantworten nach Achsen
     let userEco = [], userSoc = [];
     questions.forEach((q, idx) => {
         if(q.axis === "eco") userEco.push(userAnswers[idx]);
